@@ -1,0 +1,9 @@
+HQ-WEB (Headquarters Web Server) Details: 
+
+Static IP 192.168.99.5/28, Gateway 192.168.99.1 → gives it a permanent address for clients to reach.
+
+HTTP service ON → hosts a basic web page that clients from all VLANs (including the Branch over GRE) can access. This is how you prove routing, NAT, and ACLs are working correctly.
+
+Homepage customized (“Welcome to HQ-WEB”) → makes it easy to identify you’re reaching the correct server when you test in Packet Tracer’s web browser.
+
+HQ-WEB = Web server for end-user connectivity testing.

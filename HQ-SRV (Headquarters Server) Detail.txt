@@ -1,0 +1,13 @@
+HQ-SRV (Headquarters Server) Details
+
+
+Static IP 192.168.99.4/28, Gateway 192.168.99.1 → gives the server a fixed, known address in the management subnet, so routers and PCs know where to send DHCP/DNS/TFTP requests.
+
+DHCP Pools → hands out IP addresses to every VLAN (Sales, Eng, Admin, Guest, Holding). Instead of configuring DHCP on every router, you centralize it here. The routers use ip helper-address to forward client requests to this server.
+
+DNS → resolves names to IPs (e.g., www.hq-web.com → 192.168.99.5). That way, users can type a name instead of remembering an IP.
+
+TFTP → lets routers/switches back up and restore configs (useful for lab practice and matches enterprise best practices).
+
+
+HQ-SRV = DHCP/DNS/TFTP services (foundation)
