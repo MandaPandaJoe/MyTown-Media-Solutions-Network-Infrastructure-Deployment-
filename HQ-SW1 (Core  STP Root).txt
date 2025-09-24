@@ -1,0 +1,88 @@
+HQ-SW1 (Core / STP Root)
+
+enable
+configure terminal
+hostname HQ-SW1
+no ip domain-lookup
+
+! ---- VLANs ----
+vlan 10
+ name Management
+vlan 20
+ name Sales
+vlan 30
+ name Engineering
+vlan 99
+ name Holding
+exit
+
+! ---- Trunk to HQ-RTR (router-on-a-stick) ----
+interface fa0/1
+ description Trunk to HQ-RTR fa0/0
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,99
+ spanning-tree portfast trunk
+exit
+
+! ---- EtherChannel to HQ-SW2 (PAgP) ----
+interface range fa0/2 - 3
+ description EtherChannel links to HQ-SW2
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,99
+ channel-group 1 mode desirable
+exit
+interface port-channel 1
+ description Po1 to HQ-SW2
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,99
+exit
+
+! ---- STP Root for user VLANs ----
+spanning-tree vlan 10,20,30 priority 24576
+
+! ---- Example access ports (adjust as you cable) ----
+interface fa0/5
+ description Sales PC1
+ switchport mode access
+ switchport access vlan 20
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ spanning-tree portfast
+exit
+
+interface fa0/6
+ description Engineering PC1
+ switchport mode access
+ switchport access vlan 30
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ spanning-tree portfast
+exit
+
+interface fa0/7
+ description HQ-SRV (DHCP/DNS/TFTP)
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+exit
+
+interface fa0/8
+ description HQ-WEB (HTTP)
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+exit
+
+! ---- Unused ports → VLAN99 + shutdown ----
+interface range fa0/9 - 24
+ switchport mode access
+ switchport access vlan 99
+ shutdown
+exit
+
+end
+write memory

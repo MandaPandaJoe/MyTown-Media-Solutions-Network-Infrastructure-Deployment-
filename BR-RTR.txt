@@ -1,0 +1,34 @@
+BR-RTR
+
+hostname BR-RTR
+!
+interface fa0/0.40
+ encapsulation dot1Q 40
+ ip address 192.168.99.49 255.255.255.248
+ ip helper-address 192.168.99.4
+!
+interface fa0/0.50
+ encapsulation dot1Q 50
+ ip address 192.168.99.57 255.255.255.248
+ ip helper-address 192.168.99.4
+!
+interface fa0/0.99
+ encapsulation dot1Q 99
+ ip address 192.168.99.66 255.255.255.248
+ ip helper-address 192.168.99.4
+!
+interface fa0/1
+ ip address 198.51.100.2 255.255.255.252
+ no shutdown
+!
+interface Tunnel0
+ ip address 192.168.98.2 255.255.255.252
+ tunnel source fa0/1
+ tunnel destination 203.0.113.2
+ no shutdown
+!
+router ospf 1
+ router-id 2.2.2.2
+ passive-interface default
+ no passive-interface Tunnel0
+ network 192.168.98.0 0.0.0.3 area 0

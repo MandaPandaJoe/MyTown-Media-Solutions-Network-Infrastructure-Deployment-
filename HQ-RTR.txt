@@ -1,0 +1,61 @@
+HQ-RTR
+
+hostname HQ-RTR
+!
+interface fa0/0.10
+ encapsulation dot1Q 10
+ ip address 192.168.99.1 255.255.255.240
+ ip nat inside
+ ip helper-address 192.168.99.4
+!
+interface fa0/0.20
+ encapsulation dot1Q 20
+ ip address 192.168.99.17 255.255.255.240
+ ip nat inside
+ ip helper-address 192.168.99.4
+!
+interface fa0/0.30
+ encapsulation dot1Q 30
+ ip address 192.168.99.33 255.255.255.240
+ ip nat inside
+ ip helper-address 192.168.99.4
+!
+interface fa0/0.99
+ encapsulation dot1Q 99
+ ip address 192.168.99.65 255.255.255.248
+ ip nat inside
+ ip helper-address 192.168.99.4
+!
+interface fa0/1
+ ip address 203.0.113.2 255.255.255.252
+ ip nat outside
+!
+interface Tunnel0
+ ip address 192.168.98.1 255.255.255.252
+ tunnel source fa0/1
+ tunnel destination 198.51.100.2
+ no shutdown
+!
+router ospf 1
+ router-id 1.1.1.1
+ passive-interface default
+ no passive-interface Tunnel0
+ network 192.168.98.0 0.0.0.3 area 0
+!
+access-list 10 permit 192.168.99.0 0.0.0.127
+ip nat inside source list 10 interface fa0/1 overload
+!
+ip access-list extended VLAN-POLICY
+ deny ip 192.168.99.16 0.0.0.15 192.168.99.32 0.0.0.15
+ deny ip 192.168.99.32 0.0.0.15 192.168.99.16 0.0.0.15
+ permit ip 192.168.99.0 0.0.0.15 any
+ permit ip 192.168.99.0 0.0.0.127 any
+!
+interface fa0/0.10
+ ip access-group VLAN-POLICY in
+interface fa0/0.20
+ ip access-group VLAN-POLICY in
+interface fa0/0.30
+ ip access-group VLAN-POLICY in
+interface fa0/0.99
+ ip access-group VLAN-POLICY in

@@ -1,0 +1,70 @@
+BR-SW1 (Branch)
+
+enable
+configure terminal
+hostname BR-SW1
+no ip domain-lookup
+
+! ---- VLANs ----
+vlan 40
+ name Admin
+vlan 50
+ name Guest
+vlan 99
+ name Holding
+exit
+
+! ---- Trunk to BR-RTR (router-on-a-stick) ----
+interface fa0/1
+ description Trunk to BR-RTR fa0/0
+ switchport mode trunk
+ switchport trunk allowed vlan 40,50,99
+ spanning-tree portfast trunk
+exit
+
+! ---- Access ports ----
+interface fa0/5
+ description Admin PC
+ switchport mode access
+ switchport access vlan 40
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ spanning-tree portfast
+exit
+
+interface fa0/6
+ description Guest PC1
+ switchport mode access
+ switchport access vlan 50
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security violation shutdown
+ switchport port-security mac-address sticky
+ spanning-tree portfast
+exit
+
+interface fa0/7
+ description Guest PC2
+ switchport mode access
+ switchport access vlan 50
+ spanning-tree portfast
+exit
+
+interface fa0/8
+ description Guest PC3
+ switchport mode access
+ switchport access vlan 50
+ spanning-tree portfast
+exit
+
+! ---- Unused ports → VLAN99 + shutdown ----
+interface range fa0/9 - 24
+ switchport mode access
+ switchport access vlan 99
+ shutdown
+exit
+
+end
+write memory

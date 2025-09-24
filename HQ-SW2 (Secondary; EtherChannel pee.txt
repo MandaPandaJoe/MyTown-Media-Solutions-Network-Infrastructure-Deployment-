@@ -1,0 +1,59 @@
+HQ-SW2 (Secondary; EtherChannel peer)
+
+enable
+configure terminal
+hostname HQ-SW2
+no ip domain-lookup
+
+! ---- VLANs (must match HQ-SW1) ----
+vlan 10
+ name Management
+vlan 20
+ name Sales
+vlan 30
+ name Engineering
+vlan 99
+ name Holding
+exit
+
+! ---- EtherChannel to HQ-SW1 (PAgP) ----
+interface range fa0/2 - 3
+ description EtherChannel links to HQ-SW1
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,99
+ channel-group 1 mode auto
+exit
+interface port-channel 1
+ description Po1 to HQ-SW1
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,99
+exit
+
+! ---- Example access ports ----
+interface fa0/5
+ description Sales PC2
+ switchport mode access
+ switchport access vlan 20
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ spanning-tree portfast
+exit
+
+interface fa0/6
+ description Mgmt PC
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+exit
+
+! ---- Unused ports → VLAN99 + shutdown ----
+interface range fa0/7 - 24
+ switchport mode access
+ switchport access vlan 99
+ shutdown
+exit
+
+end
+write memory
